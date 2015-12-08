@@ -1,6 +1,6 @@
 # svg.connections.js
 
-Yet another plugin for the [svg.js](http://svgjs.com) library to make elements connectable!
+Yet another plugin for the [svg.js](http://github.com/wout/svg.js) library to make elements connectable!
 
 ### Why another one?
 
