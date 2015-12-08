@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>svg.connections.js</title>
+    <style type="text/css">
+      html, body, #drawing {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="drawing"></div>
+
+
+    <script type="text/javascript" src="https://raw.githubusercontent.com/wout/svg.js/master/dist/svg.min.js"></script>
+    <script type="text/javascript" src="https://raw.githubusercontent.com/wout/svg.draggable.js/master/dist/svg.draggable.min.js"></script>
+    <script src="src/svg.connections.js"></script>
+
+    <script>
+        
+      var a, b, c
+        , draw = SVG('drawing').attr({ 'font-size': 10 }).fill('#005ce6')
+
+      a = draw.rect(100,100).center(150, 150).addClass('node1').connectable()
+      draw.plain('Drag from here').center(150, 210)
+
+      b = draw.rect(100,100).center(500, 150).addClass('node2').connectable()
+      draw.plain('Drop here').center(500, 210)
+
+    </script>
+  </body>
+</html>
