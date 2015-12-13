@@ -28,7 +28,6 @@
       this.connectionComplete = true
       this.coords[1] = [this.parentTo.cx(), this.parentTo.cy()]
     }
-    
   }
 
   Connector.prototype.complete = function() {
@@ -54,7 +53,6 @@
     this.rootSvg = this.elem.parent(SVG.Doc)
   }
 
-
   // Sets or updates the given options and listens for events
   ConnectionHandler.prototype.init = function(options) { 
     var that = this
@@ -63,18 +61,14 @@
     this.elem.on('mouseup.connects', function(e){ that.drop(e) })
   }
 
-
   // Stops listening events
   ConnectionHandler.prototype.terminate = function() {
     this.elem.off('mousedown.connects')
     this.elem.off('mouseup.connects')
   }
 
-
   // Starts tracking the element's dragging
   ConnectionHandler.prototype.startDrag = function(e) {
-    console.log(this.elem.node.id + ': Hey! You\'re dragging me! :)')
-
     var that = this
 
     // check for left button
@@ -99,13 +93,17 @@
     e.stopPropagation();
   }
 
+  // Updates the path according to mouse position
+  ConnectionHandler.prototype.drag = function(e){
+      this.rootSvg.newArc.setTo( [e.clientX, e.clientY] )
+      this.rootSvg.newArc.update()
+  }
 
   // Dragging has ended: let's do the cleanup
   ConnectionHandler.prototype.stopDrag = function(e){
     this.elem.fire('dragstop', { event: e, handler: this })
 
     this.rootSvg.newArc.complete()
-    //delete this.newArcCoords
     delete this.rootSvg.newArc
 
     // unbind events
@@ -113,18 +111,8 @@
     SVG.off(window, 'mouseup.connects')
   }
 
-
-  // Updates the path according to mouse position
-  ConnectionHandler.prototype.drag = function(e){
-      this.rootSvg.newArc.setTo( [e.clientX, e.clientY] )
-      this.rootSvg.newArc.update()
-  }
-
-
   // Starts tracking the element's dragging
   ConnectionHandler.prototype.drop = function(e) {
-    console.log(this.elem.node.id + ': You dropped me.. :(')
-      
     this.elem.fire('dropped', { event: e, handler: this })
 
     this.rootSvg.newArc.setTo(this.elem)
