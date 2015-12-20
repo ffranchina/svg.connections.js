@@ -1,5 +1,11 @@
 ;(function() {
 
+  // Computes the real center (even if translated)
+  function getCenter(elem) {
+    var ctm = elem.node.getCTM()
+    return [elem.cx() + ctm.e, elem.cy() + ctm.f]
+  }
+
   // Object used to describe the real SVG connector
   function Connector(parent) {
     this.parent = parent
@@ -13,7 +19,7 @@
   // To set which node the connection is coming from
   Connector.prototype.setFrom = function(parentFrom) {
     this.parentFrom = parentFrom
-    this.coords[0] = [this.parentFrom.cx(), this.parentFrom.cy()]
+    this.coords[0] = getCenter(this.parentFrom)
   }
 
   // To set which node the connection is going to
@@ -26,7 +32,7 @@
       // It has been passed the second parent node
       this.parentTo = parentTo
       this.connectionComplete = true
-      this.coords[1] = [this.parentTo.cx(), this.parentTo.cy()]
+      this.coords[1] = getCenter(this.parentTo)
     }
   }
 
@@ -40,8 +46,13 @@
   }
 
   // Requests a redraw based on the parents' position
-  Connector.prototype.update = function() { 
-    this.path.plot(this.coords)
+  Connector.prototype.update = function() {
+    if (this.connectionComplete) {
+      this.coords[0] = getCenter(this.parentFrom)
+      this.coords[1] = getCenter(this.parentTo)
+    }
+
+    this.path.plot(this.coords) 
   }
 
 
@@ -119,6 +130,7 @@
     this.rootSvg.newArc.update()
 
   }
+
   
 
   SVG.extend(SVG.Element, {
@@ -152,6 +164,18 @@
         connectionHandler.terminate()
 
       return this
+    },
+
+    // Redraw all the connections for the current node
+    updateConnections: function() {
+        // The node _must_ be already initialized
+        var connectionHandler = this.remember('_connectable')
+
+        this.connections.forEach(function(conn) {
+          conn.update()
+        })
+
+        return this
     }
 
   })

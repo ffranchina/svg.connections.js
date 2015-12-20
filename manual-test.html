@@ -23,10 +23,18 @@
 
     <script>
         
-      var a, b, c
+      var a, b, rect, handle
         , draw = SVG('drawing').attr({ 'font-size': 10 }).fill('#005ce6')
 
-      a = draw.rect(100,100).center(150, 150).addClass('node1').connectable()
+      a = draw.group()
+      rect = draw.rect(100,100).center(150, 150).addClass('node1').connectable()
+      handle = draw.rect(50,50).center(200, 200)
+      a.add(rect)
+      a.add(handle)
+      a.draggable()
+      a.on('dragmove', function(){
+        rect.updateConnections()
+      })
       draw.plain('Drag from here').center(150, 210)
 
       b = draw.rect(100,100).center(500, 150).addClass('node2').connectable()
