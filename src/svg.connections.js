@@ -1,5 +1,11 @@
 ;(function() {
 
+  // Init Function
+  function init() {
+    console.log('init mod svg.connections.js')
+  }
+  init()
+
   // Computes the real center (even if translated)
   function getCenter(elem) {
     var ctm = elem.node.getCTM()
