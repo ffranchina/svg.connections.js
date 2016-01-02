@@ -54,8 +54,8 @@
   ConnectionHandler.prototype.init = function(options) { 
     var that = this
     
-    this.elem.on('mousedown.connects', function(e){ that.startDrag(e) })
-    this.elem.on('mouseup.connects', function(e){ that.drop(e) })
+    this.elem.on('mousedown.connects', function(e) { that.startDrag(e) })
+    this.elem.on('mouseup.connects', function(e) { that.drop(e) })
   }
 
   // Stops listening events - no more connectable
@@ -69,11 +69,9 @@
     var that = this
 
     // check for left button
-    if(e.type == 'click'|| e.type == 'mousedown' || e.type == 'mousemove') {
-      if((e.which || e.buttons) != 1) {
-          return
-      }
-    }
+    if(e.type == 'click'|| e.type == 'mousedown' || e.type == 'mousemove')
+      if((e.which || e.buttons) != 1)
+        return
 
     this.elem.fire('connectiondragstart', { event: e, handler: this })
 
@@ -81,16 +79,16 @@
     this.rootDraw.tmpConnection = new TmpConnector(this.rootDraw, this.elem)
     
     // bind to the whole SVG events
-    SVG.on(window, 'mousemove.connects', function(e){ that.drag(e) })
-    SVG.on(window, 'mouseup.connects', function(e){ that.stopDrag(e) })
+    SVG.on(window, 'mousemove.connects', function(e) { that.drag(e) })
+    SVG.on(window, 'mouseup.connects', function(e) { that.stopDrag(e) })
     
     // prevent the browser and other parents to handle the event
     e.preventDefault()
-    e.stopPropagation();
+    e.stopPropagation()
   }
 
   // Updates the path according to mouse position
-  ConnectionHandler.prototype.drag = function(e){
+  ConnectionHandler.prototype.drag = function(e) {
     this.elem.fire('connectiondrag', { event: e, handler: this })
 
     // refresh the temporary connector
@@ -99,7 +97,7 @@
   }
 
   // Dragging has ended: let's do the cleanup
-  ConnectionHandler.prototype.stopDrag = function(e){
+  ConnectionHandler.prototype.stopDrag = function(e) {
     this.elem.fire('connectiondragstop', { event: e, handler: this })
 
     // clean up the temporary connector
@@ -121,11 +119,7 @@
     p2 = this.elem
     newConnection = this.rootDraw.connection(p1, p2)
 
-    this.rootDraw.fire('newconnection', {
-      event: e
-      , handler: this
-      , conn: newConnection
-    })
+    this.rootDraw.fire('newconnection', { event: e, handler: this, conn: newConnection })
   }
 
 
