@@ -23,7 +23,7 @@
 
     <script>
         
-      var a, b, rect, handle
+      var a, b, c, rect, handle
         , draw = SVG('drawing').attr({ 'font-size': 10 }).fill('#005ce6')
 
       a = draw.group()
@@ -33,13 +33,19 @@
       a.add(handle)
       a.draggable()
       a.on('dragmove', function(){
-        rect.updateConnections()
+        //rect.updateConnections()
       })
       draw.plain('Drag from here').center(150, 210)
 
       b = draw.rect(100,100).center(500, 150).addClass('node2').connectable()
       draw.plain('Drop here').center(500, 210)
 
+      c = draw.rect(100,100).center(150, 300).addClass('node3').connectable()
+
+      draw.on('newconnection', function(evt) {
+        draw.connection(evt.detail.parentFrom, evt.detail.parentTo)
+      })
+      draw.connection(b, c)
     </script>
   </body>
 </html>

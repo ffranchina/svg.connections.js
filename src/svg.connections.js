@@ -6,68 +6,54 @@
   }
   init()
 
+
   // Computes the real center (even if translated)
   function getCenter(elem) {
     var ctm = elem.node.getCTM()
     return [elem.cx() + ctm.e, elem.cy() + ctm.f]
   }
 
-  // Object used to describe the real SVG connector
-  function Connector(parent) {
-    this.parent = parent
-    this.path = this.parent.line(0, 0, 0, 0).stroke('#000')
-    this.parentFrom = null
-    this.parentTo = null
+
+  // Object used to describe the temporary connector
+  function TmpConnector(rootDraw, startingElem) {
+    this.path = rootDraw.line(0, 0, 0, 0).stroke('#000')
+    this.startingElem = startingElem
     this.coords = [[0, 0], [0, 0]]
-    this.connectionComplete = false
+
+    this.setFrom( getCenter( this.startingElem ) )
   }
 
-  // To set which node the connection is coming from
-  Connector.prototype.setFrom = function(parentFrom) {
-    this.parentFrom = parentFrom
-    this.coords[0] = getCenter(this.parentFrom)
+  // Returns the element from which the connection has started
+  TmpConnector.prototype.getStartingElem = function() {
+    return this.startingElem
   }
 
-  // To set which node the connection is going to
-  Connector.prototype.setTo = function(parentTo) {
-    if (parentTo instanceof Array) {
-      // It has been passed a coordinates array
-      this.coords[1] = parentTo
-
-    }else if (parentTo != this.parentFrom) {
-      // It has been passed the second parent node
-      this.parentTo = parentTo
-      this.connectionComplete = true
-      this.coords[1] = getCenter(this.parentTo)
-    }
+  // To set the coordinates the connection is coming from
+  TmpConnector.prototype.setFrom = function(coordsFrom) {
+    this.coords[0] = coordsFrom
   }
 
-  Connector.prototype.complete = function() {
-    if (this.connectionComplete) {
-      this.parentFrom.connections.push(this)
-      this.parentTo.connections.push(this)
-    } else {
-      this.path.remove()
-    }
+  // To set the coordinates the connection is going to
+  TmpConnector.prototype.setTo = function(coordsTo) {
+    this.coords[1] = coordsTo
   }
 
-  // Requests a redraw based on the parents' position
-  Connector.prototype.update = function() {
-    if (this.connectionComplete) {
-      this.coords[0] = getCenter(this.parentFrom)
-      this.coords[1] = getCenter(this.parentTo)
-    }
+  // The temporary connector's job is over
+  TmpConnector.prototype.cancel = function() {
+    this.path.remove()
+  }
 
+  // Redraw the temporay connector
+  TmpConnector.prototype.refresh = function() {
     this.path.plot(this.coords) 
   }
-
 
 
   function ConnectionHandler(elem) {
     elem.remember('_connectable', this)
     this.elem = elem
     this.elem.connections = []
-    this.rootSvg = this.elem.parent(SVG.Doc)
+    this.rootDraw = this.elem.doc()
   }
 
   // Sets or updates the given options and listens for events
@@ -78,7 +64,7 @@
     this.elem.on('mouseup.connects', function(e){ that.drop(e) })
   }
 
-  // Stops listening events
+  // Stops listening events - no more connectable
   ConnectionHandler.prototype.terminate = function() {
     this.elem.off('mousedown.connects')
     this.elem.off('mouseup.connects')
@@ -95,16 +81,15 @@
       }
     }
 
-    this.elem.fire('dragstart', { event: e, handler: this })
+    this.elem.fire('connectiondragstart', { event: e, handler: this })
 
-    // objects to handle the new connection
-    this.rootSvg.newArc = new Connector(this.rootSvg)
-    this.rootSvg.newArc.setFrom(this.elem)
-
+    // set up of the temporary connector
+    this.rootDraw.tmpConnection = new TmpConnector(this.rootDraw, this.elem)
+    
     // bind to the whole SVG events
     SVG.on(window, 'mousemove.connects', function(e){ that.drag(e) })
     SVG.on(window, 'mouseup.connects', function(e){ that.stopDrag(e) })
-
+    
     // prevent the browser and other parents to handle the event
     e.preventDefault()
     e.stopPropagation();
@@ -112,16 +97,20 @@
 
   // Updates the path according to mouse position
   ConnectionHandler.prototype.drag = function(e){
-      this.rootSvg.newArc.setTo( [e.clientX, e.clientY] )
-      this.rootSvg.newArc.update()
+    this.elem.fire('connectiondrag', { event: e, handler: this })
+
+    // refresh the temporary connector
+    this.rootDraw.tmpConnection.setTo( [e.clientX, e.clientY] )
+    this.rootDraw.tmpConnection.refresh()
   }
 
   // Dragging has ended: let's do the cleanup
   ConnectionHandler.prototype.stopDrag = function(e){
-    this.elem.fire('dragstop', { event: e, handler: this })
+    this.elem.fire('connectiondragstop', { event: e, handler: this })
 
-    this.rootSvg.newArc.complete()
-    delete this.rootSvg.newArc
+    // clean up the temporary connector
+    this.rootDraw.tmpConnection.cancel()
+    delete this.rootDraw.tmpConnection
 
     // unbind events
     SVG.off(window, 'mousemove.connects')
@@ -130,11 +119,14 @@
 
   // Starts tracking the element's dragging
   ConnectionHandler.prototype.drop = function(e) {
-    this.elem.fire('dropped', { event: e, handler: this })
+    this.elem.fire('connectiondrop', { event: e, handler: this })
 
-    this.rootSvg.newArc.setTo(this.elem)
-    this.rootSvg.newArc.update()
-
+    this.rootDraw.fire('newconnection', {
+      event: e
+      , handler: this
+      , parentFrom: this.rootDraw.tmpConnection.getStartingElem()
+      , parentTo: this.elem
+    })
   }
 
 
