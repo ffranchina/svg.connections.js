@@ -137,6 +137,55 @@
 
   }
 
+
+  SVG.Connection = SVG.invent({
+    // the SVG element will be a path
+    create: 'path'
+
+    // inherits Path's class methods
+    , inherit: SVG.Path
+
+    // add methods to the newly added shape
+    , extend: {
+      // private method: register the connection at the parents
+      connectTo: function(p1, p2) {
+        if (p1.connections.indexOf(this) == -1)
+          p1.connections.push(this)
+          
+        if (p2.connections.indexOf(this) == -1)
+          p2.connections.push(this)
+          
+        return this
+      }
+        
+      // public method: computes and updates the line according to parents' positions
+      , refresh: function(p1, p2) {
+          var cp1 = getCenter(p1)
+            , cp2 = getCenter(p2)
+            , lineString = ''
+            , controlPointDistance = cp1[0] > cp2[0] ? -150 : 150
+
+          
+          lineString += 'M' + cp1[0] + ',' + cp1[1] // starting point
+          lineString += 'C' + ( cp1[0] + controlPointDistance ) + ',' + cp1[1] // starting control point
+          lineString += ' ' + ( cp2[0] - controlPointDistance ) + ',' + cp2[1] // ending control point
+          lineString += ' ' + cp2[0] + ',' + cp2[1] // ending point
+          
+          this.plot(lineString).stroke("#000").fill('transparent')
+
+          return this
+      }
+    }
+
+    // Add the constructor of the new element to the parent
+    , construct: {
+      connection: function(p1, p2) {
+        return this.put(new SVG.Connection).connectTo(p1, p2).refresh(p1, p2)
+      }
+
+    }
+  })
+
   
 
   SVG.extend(SVG.Element, {
