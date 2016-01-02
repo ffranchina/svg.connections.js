@@ -10,7 +10,7 @@
 
   // Object used to describe the temporary connector
   function TmpConnector(rootDraw, startingElem) {
-    this.path = rootDraw.line(0, 0, 0, 0).stroke('#000')
+    this.path = rootDraw.line(0, 0, 0, 0).addClass('tmp-connector').stroke('#000')
     this.startingElem = startingElem
     this.coords = [[0, 0], [0, 0]]
 
@@ -170,7 +170,7 @@
         lineString += ' ' + ( cp2[0] - controlPointDistance ) + ',' + cp2[1] // ending control point
         lineString += ' ' + cp2[0] + ',' + cp2[1] // ending point
 
-        this.plot(lineString).stroke("#000").fill('transparent')
+        this.plot(lineString).addClass('connector').fill('transparent').stroke('#000')
 
         return this
       }

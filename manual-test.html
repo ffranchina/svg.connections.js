@@ -10,6 +10,15 @@
         height: 100%;
         margin: 0;
       }
+
+      .connector {
+        stroke: #111;
+      }
+
+      .tmp-connector {
+        stroke: #555;
+        stroke-dasharray: 5px;
+      }
     </style>
   </head>
 
@@ -24,11 +33,11 @@
     <script>
         
       var a, b, c, rect, handle
-        , draw = SVG('drawing').attr({ 'font-size': 10 }).fill('#005ce6')
+        , draw = SVG('drawing').attr({ 'font-size': 10 })
 
       a = draw.group()
-      rect = draw.rect(100,100).center(150, 150).addClass('node1').connectable()
-      handle = draw.rect(50,50).center(200, 200)
+      rect = draw.rect(100,100).fill('#005ce6').center(150, 150).addClass('node1').connectable()
+      handle = draw.rect(50,50).fill('#5c00e6').center(200, 200)
       a.add(rect)
       a.add(handle)
       a.draggable()
@@ -37,10 +46,10 @@
       })
       draw.plain('Drag from here').center(150, 210)
 
-      b = draw.rect(100,100).center(500, 150).addClass('node2').connectable()
+      b = draw.rect(100,100).fill('#005ce6').center(500, 150).addClass('node2').connectable()
       draw.plain('Drop here').center(500, 210)
 
-      c = draw.rect(100,100).center(150, 300).addClass('node3').connectable()
+      c = draw.rect(100,100).fill('#005ce6').center(150, 300).addClass('node3').connectable()
 
       draw.connection(b, c)
     </script>
