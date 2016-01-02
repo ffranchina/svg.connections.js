@@ -1,11 +1,5 @@
 ;(function() {
 
-  // Init Function
-  function init() {
-    console.log('init mod svg.connections.js')
-  }
-  init()
-
 
   // Computes the real center (even if translated)
   function getCenter(elem) {
@@ -152,20 +146,19 @@
         
       // public method: computes and updates the line according to parents' positions
       , refresh: function(p1, p2) {
-          var cp1 = getCenter(p1)
-            , cp2 = getCenter(p2)
-            , lineString = ''
-            , controlPointDistance = cp1[0] > cp2[0] ? -150 : 150
+        var cp1 = getCenter(p1)
+        , cp2 = getCenter(p2)
+        , lineString = ''
+        , controlPointDistance = cp1[0] > cp2[0] ? -150 : 150
 
-          
-          lineString += 'M' + cp1[0] + ',' + cp1[1] // starting point
-          lineString += 'C' + ( cp1[0] + controlPointDistance ) + ',' + cp1[1] // starting control point
-          lineString += ' ' + ( cp2[0] - controlPointDistance ) + ',' + cp2[1] // ending control point
-          lineString += ' ' + cp2[0] + ',' + cp2[1] // ending point
-          
-          this.plot(lineString).stroke("#000").fill('transparent')
+        lineString += 'M' + cp1[0] + ',' + cp1[1] // starting point
+        lineString += 'C' + ( cp1[0] + controlPointDistance ) + ',' + cp1[1] // starting control point
+        lineString += ' ' + ( cp2[0] - controlPointDistance ) + ',' + cp2[1] // ending control point
+        lineString += ' ' + cp2[0] + ',' + cp2[1] // ending point
 
-          return this
+        this.plot(lineString).stroke("#000").fill('transparent')
+
+        return this
       }
     }
 
@@ -174,8 +167,8 @@
       connection: function(p1, p2) {
         return this.put(new SVG.Connection).connectTo(p1, p2).refresh(p1, p2)
       }
-
     }
+    
   })
 
   
@@ -194,13 +187,10 @@
 
       value = typeof value === 'undefined' ? true : value
 
-      // TODO options to be defined
+      // TODO: options to be defined
       options = typeof options === 'undefined' ? true : {
         // specifiy if the connection is starting or ending with this element
-        'direction' : 'both', // ammitted values: 'both', 'in', 'out'
-
-        // custom class to append to the connection elements
-        'class' : 'connection' // ammitted values: any valid class string
+        'direction' : 'both' // ammitted values: 'both', 'in', 'out'
       }
 
       connectionHandler = this.remember('_connectable') || new ConnectionHandler(this)
@@ -211,18 +201,18 @@
         connectionHandler.terminate()
 
       return this
-    },
+    }
 
     // Redraw all the connections for the current node
-    updateConnections: function() {
-        // The node _must_ be already initialized
-        var connectionHandler = this.remember('_connectable')
+    , updateConnections: function() {
+      // The node _must_ be already initialized
+      var connectionHandler = this.remember('_connectable')
 
-        this.connections.forEach(function(conn) {
-          conn.update()
-        })
+      this.connections.forEach(function(conn) {
+        conn.update()
+      })
 
-        return this
+      return this
     }
 
   })
