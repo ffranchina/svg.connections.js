@@ -42,9 +42,6 @@
 
       c = draw.rect(100,100).center(150, 300).addClass('node3').connectable()
 
-      draw.on('newconnection', function(evt) {
-        draw.connection(evt.detail.parentFrom, evt.detail.parentTo)
-      })
       draw.connection(b, c)
     </script>
   </body>

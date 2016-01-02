@@ -113,13 +113,18 @@
 
   // Starts tracking the element's dragging
   ConnectionHandler.prototype.drop = function(e) {
+    var newConnection, p1, p2
+    
     this.elem.fire('connectiondrop', { event: e, handler: this })
+
+    p1 = this.rootDraw.tmpConnection.getStartingElem()
+    p2 = this.elem
+    newConnection = this.rootDraw.connection(p1, p2)
 
     this.rootDraw.fire('newconnection', {
       event: e
       , handler: this
-      , parentFrom: this.rootDraw.tmpConnection.getStartingElem()
-      , parentTo: this.elem
+      , conn: newConnection
     })
   }
 
@@ -138,13 +143,19 @@
         this.p1 = p1
         this.p2 = p2
         
-        if (this.p1.connections.indexOf(this) == -1)
-          this.p1.connections.push(this)
-          
-        if (this.p2.connections.indexOf(this) == -1)
-          this.p2.connections.push(this)
+        this.p1.connections.push(this)
+        this.p2.connections.push(this)
           
         return this
+      }
+
+      // public method: removes the connection and does the cleanups
+      , cancel: function() {
+
+        this.p1.connections.splice( this.p1.connections.indexOf(this), 1 )
+        this.p2.connections.splice( this.p2.connections.indexOf(this), 1 )
+
+        this.remove()
       }
         
       // public method: computes and updates the line according to parents' positions
