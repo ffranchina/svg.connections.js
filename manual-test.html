@@ -33,7 +33,7 @@
       a.add(handle)
       a.draggable()
       a.on('dragmove', function(){
-        //rect.updateConnections()
+        rect.refreshConnections()
       })
       draw.plain('Drag from here').center(150, 210)
 

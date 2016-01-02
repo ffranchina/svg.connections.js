@@ -135,19 +135,22 @@
     , extend: {
       // private method: register the connection at the parents
       connectTo: function(p1, p2) {
-        if (p1.connections.indexOf(this) == -1)
-          p1.connections.push(this)
+        this.p1 = p1
+        this.p2 = p2
+        
+        if (this.p1.connections.indexOf(this) == -1)
+          this.p1.connections.push(this)
           
-        if (p2.connections.indexOf(this) == -1)
-          p2.connections.push(this)
+        if (this.p2.connections.indexOf(this) == -1)
+          this.p2.connections.push(this)
           
         return this
       }
         
       // public method: computes and updates the line according to parents' positions
-      , refresh: function(p1, p2) {
-        var cp1 = getCenter(p1)
-        , cp2 = getCenter(p2)
+      , refresh: function() {
+        var cp1 = getCenter( this.p1 )
+        , cp2 = getCenter( this.p2 )
         , lineString = ''
         , controlPointDistance = cp1[0] > cp2[0] ? -150 : 150
 
@@ -165,7 +168,7 @@
     // Add the constructor of the new element to the parent
     , construct: {
       connection: function(p1, p2) {
-        return this.put(new SVG.Connection).connectTo(p1, p2).refresh(p1, p2)
+        return this.put(new SVG.Connection).connectTo(p1, p2).refresh()
       }
     }
     
@@ -204,12 +207,12 @@
     }
 
     // Redraw all the connections for the current node
-    , updateConnections: function() {
+    , refreshConnections: function() {
       // The node _must_ be already initialized
       var connectionHandler = this.remember('_connectable')
 
       this.connections.forEach(function(conn) {
-        conn.update()
+        conn.refresh()
       })
 
       return this
