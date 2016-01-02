@@ -179,7 +179,8 @@
     // Add the constructor of the new element to the parent
     , construct: {
       connection: function(p1, p2) {
-        return this.put(new SVG.Connection).connectTo(p1, p2).refresh()
+        if (p1 != p2)
+          return this.put(new SVG.Connection).connectTo(p1, p2).refresh()
       }
     }
     
