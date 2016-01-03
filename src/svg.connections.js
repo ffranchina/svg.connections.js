@@ -11,6 +11,7 @@
   // Object used to describe the temporary connector
   function TmpConnector(rootDraw, startingElem) {
     this.path = rootDraw.line(0, 0, 0, 0).addClass('tmp-connector').stroke('#000')
+    this.path.style('pointer-events', 'none')
     this.startingElem = startingElem
     this.coords = [[0, 0], [0, 0]]
 
